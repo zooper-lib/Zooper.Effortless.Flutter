@@ -1,9 +1,27 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
+import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart';
 
-class DomainEventHandlerGenerator extends Generator {
+class DomainEventHandlerGenerator extends GeneratorForAnnotation<GenerateHandlerRegistration> {
   @override
+  generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) {
+    if (element is! ClassElement) return '';
+
+    if (isDomainEventHandler(element)) {
+      final eventType = getEventType(element);
+      // Wrap the registration in a function
+      return '''
+      void registerGeneratedHandlers() {
+        GetIt.I.registerSingleton<DomainEventHandler<$eventType>>(${element.name}());
+      }
+      ''';
+    }
+
+    return '';
+  }
+
+  /* @override
   Future<String> generate(LibraryReader library, BuildStep buildStep) async {
     final buffer = StringBuffer();
 
@@ -22,7 +40,7 @@ class DomainEventHandlerGenerator extends Generator {
     buffer.writeln('}');
 
     return buffer.toString();
-  }
+  } */
 
   bool isDomainEventHandler(ClassElement classElement) {
     return classElement.interfaces.any((interfaceType) {
