@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      zooper_effortless_flutter_ddd_generator|domainEventHandlerGeneratorBuilder:
+        enabled: true # This enables the builder for all targets in this package
+
+builders:
+  domainEventHandlerGeneratorBuilder: # This defines the builder
+    import: "package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart"
+    builder_factories: ["handlerGeneratorBuilder"]
+    build_extensions: { ".dart": [".zooper_effortless_flutter_ddd.g.dart"] }
+    auto_apply: dependents # Automatically applies this builder to packages that depend on this one
+    build_to: cache # The generated output will be stored in the cache directory
+    applies_builders: ["source_gen|combining_builder"] # This specifies that the source_gen combining_builder should be run after this builder

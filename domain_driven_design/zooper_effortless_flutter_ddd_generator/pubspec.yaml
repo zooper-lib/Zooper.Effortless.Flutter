@@ -1,0 +1,29 @@
+name: zooper_effortless_flutter_ddd_generator
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ">=3.2.6 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  analyzer: ^6.2.0
+
+  build:
+  source_gen:
+
+  zooper_effortless_flutter_ddd:
+    path: ../zooper_effortless_flutter_ddd
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+  build_runner:
+
+flutter:
