@@ -1,12 +1,10 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'handler_aggregation.dart';
-
 // **************************************************************************
 // DomainEventHandlerGenerator
 // **************************************************************************
 
-void registerGeneratedHandlers() {
-  GetIt.I.registerSingleton<DomainEventHandler<EventTwo>>(EventTwoHandler());
-  GetIt.I.registerSingleton<DomainEventHandler<EventOne>>(EventOneHandler());
-}
+import 'package:get_it/get_it.dart';
+import 'path/to/domain_event_handler.dart';
+
+void registerGeneratedHandlers() {}

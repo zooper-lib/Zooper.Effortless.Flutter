@@ -1,7 +1,8 @@
+import 'package:example/handler_aggregation.generated.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  //registerGeneratedHandlers();
+  registerGeneratedHandlers();
 
   runApp(const MyApp());
 }

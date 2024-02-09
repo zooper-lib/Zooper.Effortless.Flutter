@@ -6,7 +6,10 @@ import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutte
 import 'package:get_it/get_it.dart';
 import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';
 
-part 'handler_aggregation.g.dart';
+//part 'handler_aggregation.generated.dart';
+//
+//@HandlerAggregate()
+//void triggerCodeGeneration() {}
 
 @HandlerAggregate()
-void triggerCodeGeneration() {}
+class HandlerAggregation {}
