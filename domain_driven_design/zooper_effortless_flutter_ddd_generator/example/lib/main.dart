@@ -1,5 +1,8 @@
+import 'package:example/events/event_one.dart';
 import 'package:example/handler_aggregation.generated.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';
 
 void main() {
   registerGeneratedHandlers();
@@ -36,9 +39,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    final domainEventHandler = GetIt.I.get<DomainEventHandler<EventOne>>();
+
+    domainEventHandler.handle(EventOne('Hello', 42));
   }
 
   @override

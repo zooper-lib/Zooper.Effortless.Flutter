@@ -2,8 +2,10 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
+import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart';
+import 'package:glob/glob.dart';
 
-class DomainEventHandlerGenerator extends Generator {
+class DomainEventHandlerGenerator extends GeneratorForAnnotation<HandlerAggregate> {
   final List<String> _globalImports = [];
   final List<String> _classImports = [];
   final List<String> _classRegistrations = [];
@@ -11,26 +13,32 @@ class DomainEventHandlerGenerator extends Generator {
   static final Map<DartType, ClassElement> collectedData = {};
 
   @override
-  Future<String> generate(LibraryReader library, BuildStep buildStep) async {
-    _findAndRegisterClasses(library, buildStep);
+  Future<String> generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) async {
+    await _findAndRegisterClasses2(buildStep);
 
     _generateLibraryImports();
 
     _generateClassImportList(buildStep);
 
-    _generateClassRegistrationList(library, buildStep);
+    await _generateClassRegistrationList(buildStep);
 
     return _generateOutput();
   }
 
-  void _findAndRegisterClasses(LibraryReader library, BuildStep buildStep) {
-    for (var classElement in library.allElements.whereType<ClassElement>()) {
-      if (_isDomainEventHandler(classElement)) {
-        final eventType = _getEventDartType(classElement);
+  Future<void> _findAndRegisterClasses2(BuildStep buildStep) async {
+    await for (final input in buildStep.findAssets(Glob('lib/**/*.dart'))) {
+      final library = await buildStep.resolver.libraryFor(input);
 
-        collectedData[eventType] = classElement;
+      for (var classElement in library.topLevelElements.whereType<ClassElement>()) {
+        if (_isDomainEventHandler(classElement)) {
+          final eventType = _getEventDartType(classElement);
+
+          collectedData[eventType] = classElement;
+        }
       }
     }
+
+    print('Found ${collectedData.length} classes');
   }
 
   String _generateOutput() {
@@ -62,30 +70,47 @@ class DomainEventHandlerGenerator extends Generator {
 
   void _generateLibraryImports() {
     _globalImports.add("import 'package:get_it/get_it.dart';");
-    _globalImports.add("import 'path/to/domain_event_handler.dart';");
+    _globalImports.add("import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';");
   }
 
   void _generateClassImportList(BuildStep buildStep) {
     for (var entry in collectedData.entries) {
-      final importStatement = _generateClassImport(entry.value, buildStep);
+      final eventType = entry.key;
+      final handlerClassElement = entry.value;
 
-      _classImports.add(importStatement);
+      // Generate import for the handler
+      final handlerImportStatement = _generateClassImport(handlerClassElement, buildStep);
+      if (!_classImports.contains(handlerImportStatement)) {
+        _classImports.add(handlerImportStatement);
+      }
+
+      // Generate import for the event, assuming the event type is a ClassElement
+      if (eventType.element is ClassElement) {
+        final eventClassElement = eventType.element as ClassElement;
+        final eventImportStatement = _generateClassImport(eventClassElement, buildStep);
+        if (!_classImports.contains(eventImportStatement)) {
+          _classImports.add(eventImportStatement);
+        }
+      }
     }
   }
 
   String _generateClassImport(ClassElement classElement, BuildStep buildStep) {
-    final packageName = buildStep.inputId.package;
-    final filePath = classElement.source.uri.path; // Assuming the classElement comes from a source in lib/
-    final relativePath = filePath.replaceFirst('lib/', ''); // Remove 'lib/'
+    final filePath = classElement.source.uri.path;
+    final relativePath = filePath.replaceFirst('lib/', '');
 
-    return "import 'package:$packageName/$relativePath';";
+    return "import 'package:$relativePath';";
   }
 
-  void _generateClassRegistrationList(LibraryReader library, BuildStep buildStep) {
-    for (var classElement in library.allElements.whereType<ClassElement>()) {
-      if (_isDomainEventHandler(classElement)) {
-        final eventType = _getEventType(classElement);
-        _classRegistrations.add('GetIt.I.registerSingleton<DomainEventHandler<$eventType>>(${classElement.name}());');
+  Future<void> _generateClassRegistrationList(BuildStep buildStep) async {
+    await for (final input in buildStep.findAssets(Glob('lib/**/*.dart'))) {
+      final library = await buildStep.resolver.libraryFor(input);
+
+      for (var classElement in library.topLevelElements.whereType<ClassElement>()) {
+        if (_isDomainEventHandler(classElement)) {
+          final eventType = _getEventType(classElement);
+          _classRegistrations.add('GetIt.I.registerSingleton<DomainEventHandler<$eventType>>(${classElement.name}());');
+        }
       }
     }
   }

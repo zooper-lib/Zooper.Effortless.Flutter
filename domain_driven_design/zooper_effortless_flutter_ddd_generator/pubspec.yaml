@@ -15,6 +15,7 @@ dependencies:
 
   build:
   source_gen:
+  glob:
 
   zooper_effortless_flutter_ddd:
     path: ../zooper_effortless_flutter_ddd
