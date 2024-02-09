@@ -1,20 +1,23 @@
 targets:
   $default:
     builders:
-      zooper_effortless_flutter_ddd_generator|domainEventHandlerGeneratorBuilder:
+      zooper_effortless_flutter_ddd_generator|handlerGeneratorBuilder:
+        enabled: false
+      zooper_effortless_flutter_ddd_generator|aggregateBuilder:
         enabled: true
 
 builders:
-  domainEventHandlerGeneratorBuilder: # This defines the builder
+  handlerGeneratorBuilder:
     import: "package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart"
     builder_factories: ["handlerGeneratorBuilder"]
-    build_extensions: { ".dart": [".zooper_effortless_flutter_ddd.g.dart"] }
-    auto_apply: dependents # Automatically applies this builder to packages that depend on this one
-    build_to: cache # The generated output will be stored in the cache directory
-    applies_builders: ["source_gen|combining_builder"] # This specifies that the source_gen combining_builder should be run after this builder
-
-  aggregatedRegistrationGenerator:
-    import: "package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart"
-    builder_factories: ["aggregatedRegistrationBuilder"]
-    build_extensions: { ".handler.g.dart": [".aggregated_handlers.dart"] }
+    build_extensions: { ".dart": [".domain_handler"] }
     auto_apply: dependents
+    applies_builders: ["source_gen|combining_builder"]
+
+  aggregateBuilder:
+    import: "package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart"
+    builder_factories: ["aggregateBuilderFactory"]
+    build_extensions: { ".dart": [".aggregate.dart"] }
+    auto_apply: dependents
+    runs_before: ["source_gen|combining_builder"]
+    build_to: source
