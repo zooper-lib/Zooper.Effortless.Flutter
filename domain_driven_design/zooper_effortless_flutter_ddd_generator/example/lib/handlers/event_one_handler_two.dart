@@ -1,13 +1,13 @@
-import 'package:example/events/event_two.dart';
+import 'package:example/events/event_one.dart';
 import 'package:get/get.dart';
 import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';
 
-class EventTwoHandler implements DomainEventHandler<EventTwo> {
+class EventOneHandlerTwo implements DomainEventHandler<EventOne> {
   @override
-  Future<void> handle(EventTwo event) async {
+  Future<void> handle(EventOne event) async {
     Get.snackbar(
       'Event received',
-      'EventTwo handled',
+      'EventOne handled with handler 2',
       snackPosition: SnackPosition.BOTTOM,
     );
   }

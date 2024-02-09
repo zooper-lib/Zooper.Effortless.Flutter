@@ -14,7 +14,7 @@ class DomainEventHandlerGenerator extends GeneratorForAnnotation<HandlerAggregat
 
   @override
   Future<String> generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) async {
-    await _findAndRegisterClasses2(buildStep);
+    await _findAndRegisterClasses(buildStep);
 
     _generateLibraryImports();
 
@@ -25,7 +25,7 @@ class DomainEventHandlerGenerator extends GeneratorForAnnotation<HandlerAggregat
     return _generateOutput();
   }
 
-  Future<void> _findAndRegisterClasses2(BuildStep buildStep) async {
+  Future<void> _findAndRegisterClasses(BuildStep buildStep) async {
     await for (final input in buildStep.findAssets(Glob('lib/**/*.dart'))) {
       final library = await buildStep.resolver.libraryFor(input);
 
@@ -37,8 +37,6 @@ class DomainEventHandlerGenerator extends GeneratorForAnnotation<HandlerAggregat
         }
       }
     }
-
-    print('Found ${collectedData.length} classes');
   }
 
   String _generateOutput() {

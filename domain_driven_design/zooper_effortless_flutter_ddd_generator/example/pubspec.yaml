@@ -12,6 +12,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
+  get: ^4.6.6
   get_it: ^7.1.3
 
   zooper_effortless_flutter_ddd:

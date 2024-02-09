@@ -1,11 +1,21 @@
-import 'package:example/events/event_one.dart';
+import 'package:example/events/index.dart';
 import 'package:example/handler_aggregation.generated.dart';
+import 'package:example/handlers/event_one_handler_one.dart';
+import 'package:example/handlers/event_one_handler_two.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
+import 'package:get/get.dart';
 import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';
+
+import 'handlers/event_two_handler.dart';
 
 void main() {
   registerGeneratedHandlers();
+
+  final domainEventDispatcher = DomainEventDispatcher.instance;
+  domainEventDispatcher.registerHandler(EventOneHandlerOne());
+  domainEventDispatcher.registerHandler(EventOneHandlerTwo());
+
+  domainEventDispatcher.registerHandler(EventTwoHandler());
 
   runApp(const MyApp());
 }
@@ -15,13 +25,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return GetMaterialApp(
+      title: 'DomainEventDispatcher Example',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'DomainEventDispatcher Example'),
     );
   }
 }
@@ -36,12 +46,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  void _incrementCounter() async {
+    final domainEventDispatcher = DomainEventDispatcher.instance;
+    await domainEventDispatcher.dispatch(EventOne());
+    await domainEventDispatcher.dispatch(EventOne());
 
-  void _incrementCounter() {
-    final domainEventHandler = GetIt.I.get<DomainEventHandler<EventOne>>();
-
-    domainEventHandler.handle(EventOne('Hello', 42));
+    await domainEventDispatcher.dispatch(EventTwo());
   }
 
   @override
@@ -56,19 +66,24 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              'Push the buttons to dispath events',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                await DomainEventDispatcher.instance.dispatch(EventOne());
+              },
+              child: const Text('Event One'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                await DomainEventDispatcher.instance.dispatch(EventTwo());
+              },
+              child: const Text('Event Two'),
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
