@@ -1,54 +1,32 @@
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart';
 
-class DomainEventHandlerGenerator extends GeneratorForAnnotation<GenerateHandlerRegistration> {
+class DomainEventHandlerGenerator extends Generator {
   @override
-  Future<String> generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) async {
-    print('Running annotation processor for DomainEventHandlerGenerator');
+  Future<String> generate(LibraryReader library, BuildStep buildStep) async {
+    final buffer = StringBuffer();
 
-    final libraryElements = await buildStep.resolver.libraries.toList();
+    print('Generating: "void registerGeneratedHandlers2() {"');
+    buffer.writeln('void registerGeneratedHandlers2() {');
 
-    for (final library in libraryElements) {
-      // Avoid scanning non-user libraries (e.g., Dart SDK and packages)
-      if (!library.isInSdk && !library.source.uri.toString().contains('package:')) {
-        for (final classElement in library.classes) {
-          if (classElement.interfaces.any((interfaceType) => interfaceType.element2.name == 'MyInterface')) {
-            // Class implements MyInterface, add it to the buffer
-            buffer.writeln('${classElement.name},');
-          }
-        }
+    // Iterate through all the classes in the library
+    for (var classElement in library.allElements.whereType<ClassElement>()) {
+      if (isDomainEventHandler(classElement)) {
+        print('Found DomainEventHandler: ${classElement.name}');
+
+        final eventType = getEventType(classElement);
+        print('Found EventType: $eventType');
+
+        print('Generating: "GetIt.I.registerSingleton<DomainEventHandler<$eventType>>(${classElement.name}());"');
+        buffer.writeln('GetIt.I.registerSingleton<DomainEventHandler<$eventType>>(${classElement.name}());');
       }
     }
 
-    if (element is ClassElement && isDomainEventHandler(element)) {
-      print('Generating for ${element.name}');
+    print('Generating: "}"');
+    buffer.writeln('}');
 
-      final eventType = getEventType(element);
-      final className = element.name;
-
-      // Add data to the global collector
-      GlobalCollector.collectedData[eventType] = className;
-    }
-
-    // At this point, all annotations in the current library have been processed
-    // Generate aggregated output for this library
-    //return generateAggregatedOutput(buildStep);
-  }
-
-  String generateAggregatedOutput(BuildStep buildStep) {
-    final buffer = StringBuffer();
-
-    GlobalCollector.collectedData.forEach((eventType, className) {
-      buffer.writeln('// Handler for $eventType is $className');
-    });
-
-    // Generate a part file for this library or a standalone file as needed
-    // For a part file, use:
-    // final fileName = buildStep.inputId.path.replaceAll('.dart', '.g.dart');
-    // For a standalone file, you might need to ensure uniqueness and write to 'lib/'
-
+    print('Final Output: ${buffer.toString()}');
     return buffer.toString();
   }
 
