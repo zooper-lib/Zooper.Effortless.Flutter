@@ -6,4 +6,7 @@ part of 'handler_aggregation.dart';
 // DomainEventHandlerGenerator
 // **************************************************************************
 
-void registerGeneratedHandlers2() {}
+void registerGeneratedHandlers() {
+  GetIt.I.registerSingleton<DomainEventHandler<EventTwo>>(EventTwoHandler());
+  GetIt.I.registerSingleton<DomainEventHandler<EventOne>>(EventOneHandler());
+}

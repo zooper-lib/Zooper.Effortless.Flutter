@@ -11,3 +11,6 @@ import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutte
 
 Builder handlerGeneratorBuilder(BuilderOptions options) =>
     SharedPartBuilder([DomainEventHandlerGenerator()], 'domain_handler');
+
+//Builder handlerGeneratorBuilder(BuilderOptions options) =>
+//    LibraryBuilder(DomainEventHandlerGenerator(), generatedExtension: '.domain_handler.dart');
