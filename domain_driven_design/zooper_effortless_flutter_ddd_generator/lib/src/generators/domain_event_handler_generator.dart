@@ -5,8 +5,22 @@ import 'package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutte
 
 class DomainEventHandlerGenerator extends GeneratorForAnnotation<GenerateHandlerRegistration> {
   @override
-  dynamic generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) {
+  Future<String> generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) async {
     print('Running annotation processor for DomainEventHandlerGenerator');
+
+    final libraryElements = await buildStep.resolver.libraries.toList();
+
+    for (final library in libraryElements) {
+      // Avoid scanning non-user libraries (e.g., Dart SDK and packages)
+      if (!library.isInSdk && !library.source.uri.toString().contains('package:')) {
+        for (final classElement in library.classes) {
+          if (classElement.interfaces.any((interfaceType) => interfaceType.element2.name == 'MyInterface')) {
+            // Class implements MyInterface, add it to the buffer
+            buffer.writeln('${classElement.name},');
+          }
+        }
+      }
+    }
 
     if (element is ClassElement && isDomainEventHandler(element)) {
       print('Generating for ${element.name}');

@@ -1,0 +1,3 @@
+class HandlerAggregate {
+  const HandlerAggregate();
+}

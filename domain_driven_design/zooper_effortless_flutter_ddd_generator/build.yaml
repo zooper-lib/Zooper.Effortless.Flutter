@@ -2,8 +2,6 @@ targets:
   $default:
     builders:
       zooper_effortless_flutter_ddd_generator|handlerGeneratorBuilder:
-        enabled: false
-      zooper_effortless_flutter_ddd_generator|aggregateBuilder:
         enabled: true
 
 builders:
@@ -13,11 +11,3 @@ builders:
     build_extensions: { ".dart": [".domain_handler"] }
     auto_apply: dependents
     applies_builders: ["source_gen|combining_builder"]
-
-  aggregateBuilder:
-    import: "package:zooper_effortless_flutter_ddd_generator/zooper_effortless_flutter_ddd_generator.dart"
-    builder_factories: ["aggregateBuilderFactory"]
-    build_extensions: { ".dart": [".aggregate.dart"] }
-    auto_apply: dependents
-    runs_before: ["source_gen|combining_builder"]
-    build_to: source
