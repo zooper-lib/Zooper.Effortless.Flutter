@@ -2,14 +2,18 @@ import 'package:example/events/index.dart';
 import 'package:example/handler_aggregation.generated.dart';
 import 'package:example/handlers/event_one_handler_one.dart';
 import 'package:example/handlers/event_one_handler_two.dart';
+import 'package:example/services/service_one.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 import 'package:zooper_effortless_flutter_ddd/zooper_effortless_flutter_ddd.dart';
 
 import 'handlers/event_two_handler.dart';
 
 void main() {
   registerGeneratedHandlers();
+
+  GetIt.I.registerSingleton<ServiceOne>(ServiceOne());
 
   final domainEventDispatcher = DomainEventDispatcher.instance;
   domainEventDispatcher.registerHandler(EventOneHandlerOne());
