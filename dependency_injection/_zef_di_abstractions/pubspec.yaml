@@ -1,0 +1,12 @@
+name: zef_di_abstractions
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ">=3.2.6 <4.0.0"
+
+dependencies:
+
+dev_dependencies:
+  lints: ^2.0.0
