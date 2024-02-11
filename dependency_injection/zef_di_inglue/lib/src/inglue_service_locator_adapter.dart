@@ -1,7 +1,7 @@
 import 'package:zef_di_abstractions/zef_di_abstractions.dart';
+import 'package:zef_di_inglue/src/helpers/log_helper.dart';
 import 'package:zef_di_inglue/src/helpers/user_messages.dart';
 import 'package:zef_di_inglue/src/registration.dart';
-import 'dart:developer' as developer;
 
 class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
   final Map<Type, List<Registration>> _registrations = {};
@@ -16,6 +16,11 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required dynamic key,
     required String? environment,
   }) {
+    if (name != null && isNamedRegistered(name)) {
+      LogHelper.logWarning(registrationAlreadyExistsForTypeAndName(T, name));
+      return;
+    }
+
     var registration = SingletonRegistration<T>(
       instance: instance,
       interfaces: interfaces,
@@ -39,7 +44,7 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
 
     // Check if there are any registrations
     if (allRegistrations.isEmpty) {
-      developer.log(noRegistrationFoundForType(T), level: 500);
+      LogHelper.logInfo(noRegistrationFoundForType(T));
       return [];
     }
 
@@ -92,10 +97,14 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     );
 
     if (allInstances.isEmpty) {
-      developer.log(noRegistrationFoundForType(T), level: 500);
+      LogHelper.logInfo(noRegistrationFoundForType(T));
       return null;
     }
 
     return allInstances.first;
+  }
+
+  bool isNamedRegistered(String name) {
+    return _registrations.values.any((element) => element.any((element) => element.name == name));
   }
 }

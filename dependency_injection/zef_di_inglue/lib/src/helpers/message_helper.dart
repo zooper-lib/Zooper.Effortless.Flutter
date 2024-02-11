@@ -8,7 +8,6 @@ String interpolate(String string, List<dynamic> paramterList) {
 
   var i = -1;
   return string.replaceAllMapped(_regexExpression, (match) {
-    print(match.group(0));
     i = i + 1;
     return '${paramterList[i]}';
   });

@@ -20,7 +20,7 @@ class ServiceLocator {
   }
 
   /// Ensures the adapter is initialized and returns it
-  ServiceLocatorAdapter get _adapter {
+  ServiceLocatorAdapter get adapter {
     if (_lazyAdapter == null) {
       throw StateError('Adapter has not been initialized. Call setAdapter first.');
     }
@@ -30,12 +30,12 @@ class ServiceLocator {
   /// Registers an instance of type [T].
   void register<T extends Object>(
     T instance, {
-    required List<Type>? interfaces,
-    required String? name,
-    required dynamic key,
-    required String? environment,
+    List<Type>? interfaces,
+    String? name,
+    dynamic key,
+    String? environment,
   }) =>
-      _adapter.register<T>(
+      adapter.register<T>(
         instance,
         interfaces: interfaces,
         name: name,
@@ -45,12 +45,12 @@ class ServiceLocator {
 
   /// Retrieves an instance of type [T].
   T? getFirst<T extends Object>({
-    required Type? interface,
-    required String? name,
-    required dynamic key,
-    required String? environment,
+    Type? interface,
+    String? name,
+    dynamic key,
+    String? environment,
   }) {
-    return _adapter.getFirst<T>(
+    return adapter.getFirst<T>(
       interface: interface,
       name: name,
       key: key,
@@ -59,12 +59,12 @@ class ServiceLocator {
   }
 
   List<T> getAll<T extends Object>({
-    required Type? interface,
-    required String? name,
-    required dynamic key,
-    required String? environment,
+    Type? interface,
+    String? name,
+    dynamic key,
+    String? environment,
   }) {
-    return _adapter.getAll<T>(
+    return adapter.getAll<T>(
       interface: interface,
       name: name,
       key: key,
