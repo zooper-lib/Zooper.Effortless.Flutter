@@ -1,13 +1,11 @@
 import 'package:zef_di_abstractions/zef_di_abstractions.dart';
 
 abstract class Registration<T extends Object> {
-  final List<Type>? interfaces;
   final String? name;
   final dynamic key;
   final String? environment;
 
   Registration({
-    required this.interfaces,
     required this.name,
     required this.key,
     required this.environment,
@@ -21,7 +19,6 @@ class SingletonRegistration<T extends Object> extends Registration<T> {
 
   SingletonRegistration({
     required this.instance,
-    required super.interfaces,
     required super.name,
     required super.key,
     required super.environment,
@@ -36,7 +33,6 @@ class FactoryRegistration<T extends Object> extends Registration<T> {
 
   FactoryRegistration({
     required this.factory,
-    required super.interfaces,
     required super.name,
     required super.key,
     required super.environment,

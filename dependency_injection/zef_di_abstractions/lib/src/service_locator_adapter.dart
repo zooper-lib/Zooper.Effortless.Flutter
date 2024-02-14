@@ -1,6 +1,9 @@
+import 'package:zef_di_abstractions/zef_di_abstractions.dart';
+import 'package:any_of/any_of.dart';
+
 abstract class ServiceLocatorAdapter {
   /// Registers an instance of type [T].
-  void register<T extends Object>(
+  Triplet<Success, Conflict, InternalError> registerInstance<T extends Object>(
     T instance, {
     required List<Type>? interfaces,
     required String? name,
@@ -8,69 +11,52 @@ abstract class ServiceLocatorAdapter {
     required String? environment,
   });
 
+  /// Registers a factory for type [T].
+  Triplet<Success, Conflict, InternalError> registerFactory<T extends Object>(
+    T Function(ServiceLocator serviceLocator) factory, {
+    required List<Type>? interfaces,
+    required String? name,
+    required dynamic key,
+    required String? environment,
+  });
+
   /// Retrieves an instance of type [T].
-  T? getFirst<T extends Object>({
-    required Type? interface,
+  Triplet<T, NotFound, InternalError> getFirst<T extends Object>({
     required String? name,
     required dynamic key,
     required String? environment,
   });
 
-  List<T> getAll<T extends Object>({
-    required Type? interface,
+  /// Retrieves a List of instances of type [T].
+  Triplet<List<T>, NotFound, InternalError> getAll<T extends Object>({
     required String? name,
     required dynamic key,
     required String? environment,
   });
 
-//  /// Retrieves a named instance of type [T] using the provided [name].
-//  T getNamed<T extends Object>(String name);
-//
-//  /// Registers an asynchronous factory for type [T].
-//  void registerAsync<T extends Object>(Future<T> Function() asyncFactory);
-//
-//  /// Registers a singleton instance of type [T].
-//  void registerSingleton<T extends Object>(T instance);
-//
-//  /// Registers a singleton instance of type [T] asynchronously.
-//  void registerSingletonAsync<T extends Object>(Future<T> Function() asyncFactory);
-//
-//  /// Registers a factory for creating new instances of type [T].
-//  void registerFactory<T extends Object>(T Function() factory);
-//
-//  /// Registers an asynchronous factory for creating new instances of type [T].
-//  void registerFactoryAsync<T extends Object>(Future<T> Function() asyncFactory);
-//
-//  /// Registers a lazy singleton of type [T], instantiated on first use.
-//  void registerLazySingleton<T extends Object>(T Function() factory);
-//
-//  /// Registers a lazy singleton of type [T] asynchronously, instantiated on first use.
-//  void registerLazySingletonAsync<T extends Object>(Future<T> Function() asyncFactory);
-//
-//  /// Registers a factory of type [T] conditionally, based on [condition].
-//  void registerConditional<T extends Object>(T Function() factory, bool Function() condition);
-//
-//  /// Registers an asynchronous factory of type [T] conditionally, based on [condition].
-//  void registerConditionalAsync<T extends Object>(Future<T> Function() asyncFactory, bool Function() condition);
-//
-//  /// Registers a named instance of type [T] using the provided [name].
-//  void registerNamed<T extends Object>(String name, T instance);
-//
-//  /// Registers a named asynchronous factory of type [T] using the provided [name].
-//  void registerNamedAsync<T extends Object>(String name, Future<T> Function() asyncFactory);
-//
-//  /// Unregisters instances of type [T].
-//  void unregister<T extends Object>();
-//
-//  /// Unregisters named instances of type [T] using the provided [name].
-//  void unregisterNamed<T extends Object>(String name);
-//
-//  /// Clears all registered instances.
-//  void clearAll();
-//
-//  /// Disposes of the service locator, freeing up resources and unregistering all instances.
-//  void dispose();
-//
-//  /// Overrides an existing registration with a new instance of type [T].
-//  void overrideInstance<T extends Object>(T instance);
+  /// Overrides an existing registration with a new instance of type [T].
+  Doublet<Success, InternalError> overrideInstance<T extends Object>(
+    T instance, {
+    required String? name,
+    required dynamic key,
+    required String? environment,
+  });
+
+  /// Overrides an existing registration with a new factory of type [T].
+  Doublet<Success, InternalError> overrideFactory<T extends Object>(
+    T Function(ServiceLocator serviceLocator) factory, {
+    required String? name,
+    required dynamic key,
+    required String? environment,
+  });
+
+  /// Unregisters an instance of type [T].
+  Triplet<Success, NotFound, InternalError> unregister<T extends Object>({
+    required String? name,
+    required dynamic key,
+    required String? environment,
+  });
+
+  /// Clears all registered instances.
+  Doublet<Success, InternalError> unregisterAll();
 }

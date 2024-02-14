@@ -1,41 +1,108 @@
+import 'package:any_of/any_of.dart';
 import 'package:zef_di_abstractions/zef_di_abstractions.dart';
-import 'package:zef_di_inglue/src/helpers/log_helper.dart';
-import 'package:zef_di_inglue/src/helpers/user_messages.dart';
 import 'package:zef_di_inglue/src/registration.dart';
 
 class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
   final Map<Type, List<Registration>> _registrations = {};
 
-  Map<Type, List<Registration>> get registrations => _registrations;
-
   @override
-  void register<T extends Object>(
+  Triplet<Success, Conflict, InternalError> registerInstance<T extends Object>(
     T instance, {
     required List<Type>? interfaces,
     required String? name,
     required dynamic key,
     required String? environment,
   }) {
-    if (name != null && isNamedRegistered(name)) {
-      LogHelper.logWarning(registrationAlreadyExistsForTypeAndName(T, name));
-      return;
+    // Check if there is already a registration
+    if (_isInstanceRegistered(T, name: name, key: key, environment: environment)) {
+      //LogHelper.logWarning(registrationAlreadyExistsForType(T));
+      return Triplet.second(Conflict('Registration already exists for type $T. Skipping registration.'));
     }
 
+    // Create a registration
     var registration = SingletonRegistration<T>(
       instance: instance,
-      interfaces: interfaces,
       name: name,
       key: key,
       environment: environment,
     );
 
+    // Register the instance
     _registrations[T] ??= [];
     _registrations[T]!.add(registration);
+
+    // Register the interfaces
+    if (interfaces != null) {
+      for (var interface in interfaces) {
+        _registrations[interface] ??= [];
+        _registrations[interface]!.add(registration);
+      }
+    }
+
+    return Triplet.first(Success());
   }
 
   @override
-  List<T> getAll<T extends Object>({
-    required Type? interface,
+  Triplet<Success, Conflict, InternalError> registerFactory<T extends Object>(
+    T Function(ServiceLocator serviceLocator) factory, {
+    required List<Type>? interfaces,
+    required String? name,
+    required dynamic key,
+    required String? environment,
+  }) {
+    if (_isInstanceRegistered(T, name: name, key: key, environment: environment)) {
+      //LogHelper.logWarning(registrationAlreadyExistsForType(T));
+      return Triplet.second(Conflict('Registration already exists for type $T. Skipping registration.'));
+    }
+
+    // Create a registration
+    var registration = FactoryRegistration<T>(
+      factory: factory,
+      name: name,
+      key: key,
+      environment: environment,
+    );
+
+    // Register the instance
+    _registrations[T] ??= [];
+    _registrations[T]!.add(registration);
+
+    // Register the interfaces
+    if (interfaces != null) {
+      for (var interface in interfaces) {
+        _registrations[interface] ??= [];
+        _registrations[interface]!.add(registration);
+      }
+    }
+
+    return Triplet.first(Success());
+  }
+
+  @override
+  Triplet<T, NotFound, InternalError> getFirst<T extends Object>({
+    required String? name,
+    required key,
+    required String? environment,
+  }) {
+    // Get all instances
+    var allInstancesResponse = getAll<T>(
+      name: name,
+      key: key,
+      environment: environment,
+    );
+
+    // If there are no instances, return a NotFound
+    if (allInstancesResponse.isSecond) {
+      //LogHelper.logInfo(noRegistrationFoundForType(T));
+      return Triplet.second(allInstancesResponse.second);
+    }
+
+    // Return the first instance
+    return Triplet.first(allInstancesResponse.first.first);
+  }
+
+  @override
+  Triplet<List<T>, NotFound, InternalError> getAll<T extends Object>({
     required String? name,
     required key,
     required String? environment,
@@ -44,15 +111,8 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
 
     // Check if there are any registrations
     if (allRegistrations.isEmpty) {
-      LogHelper.logInfo(noRegistrationFoundForType(T));
-      return [];
-    }
-
-    // Filter by the interfaces
-    if (interface != null) {
-      allRegistrations = allRegistrations.where((registration) {
-        return registration.interfaces!.contains(interface);
-      }).toList();
+      //LogHelper.logInfo(noRegistrationFoundForType(T));
+      return Triplet.second(NotFound('No registration found for type $T.'));
     }
 
     // Filter by the name
@@ -79,32 +139,77 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
       return registration.resolve(ServiceLocator.I) as T;
     }).toList();
 
-    return resolvedInstances;
+    return Triplet.first(resolvedInstances);
   }
 
   @override
-  T? getFirst<T extends Object>({
-    required Type? interface,
+  Doublet<Success, InternalError> overrideInstance<T extends Object>(
+    T instance, {
+    required String? name,
+    required key,
+    required String? environment,
+  }) {}
+
+  @override
+  Doublet<Success, InternalError> overrideFactory<T extends Object>(
+    T Function(ServiceLocator serviceLocator) factory, {
     required String? name,
     required key,
     required String? environment,
   }) {
-    var allInstances = getAll<T>(
-      interface: interface,
-      name: name,
-      key: key,
-      environment: environment,
-    );
-
-    if (allInstances.isEmpty) {
-      LogHelper.logInfo(noRegistrationFoundForType(T));
-      return null;
-    }
-
-    return allInstances.first;
+    // TODO: implement overrideFactory
+    throw UnimplementedError();
   }
 
-  bool isNamedRegistered(String name) {
-    return _registrations.values.any((element) => element.any((element) => element.name == name));
+  @override
+  Triplet<Success, NotFound, InternalError> unregister<T extends Object>({
+    required String? name,
+    required key,
+    required String? environment,
+  }) {
+    // TODO: implement unregister
+    throw UnimplementedError();
+  }
+
+  @override
+  Doublet<Success, InternalError> unregisterAll() {
+    _registrations.clear();
+
+    return Doublet.first(Success());
+  }
+
+  bool _isInstanceRegistered(
+    Type type, {
+    required String? name,
+    required key,
+    required String? environment,
+  }) {
+    var allRegistrations = _registrations[type] ?? [];
+
+    // Check if there are any registrations
+    if (allRegistrations.isEmpty) {
+      return false;
+    }
+
+    // Filter by the name
+    if (name != null) {
+      allRegistrations = allRegistrations.where((registration) {
+        return registration.name == name;
+      }).toList();
+    }
+
+    // Filter by the key
+    allRegistrations = allRegistrations.where((registration) {
+      return registration.key == key;
+    }).toList();
+
+    // Filter by the environment
+    if (environment != null) {
+      allRegistrations = allRegistrations.where((registration) {
+        return registration.environment == environment;
+      }).toList();
+    }
+
+    return allRegistrations.isNotEmpty;
   }
 }

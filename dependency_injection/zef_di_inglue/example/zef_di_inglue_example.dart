@@ -5,15 +5,20 @@ import 'test_classes/implementations/index.dart';
 import 'test_classes/interfaces/index.dart';
 
 void main() {
-  // Register the Adapter with the ServiceLocator
-  final adapter = InglueServiceLocatorAdapter();
-  ServiceLocator.I.setAdapter(adapter);
+  // Build the ServiceLocator
+  ServiceLocatorBuilder().withAdapter(InglueServiceLocatorAdapter()).build();
 
   // Register the Singleton
-  ServiceLocator.I.register(
+  ServiceLocator.I.registerInstance(
     Dolphin(),
     interfaces: [Animal, Fish],
     name: 'Dolphin',
+  );
+
+  ServiceLocator.I.registerInstance(
+    Dolphin(),
+    interfaces: [Animal, Fish],
+    name: 'Dolphin2',
   );
 
   // Retrieve the Singleton
