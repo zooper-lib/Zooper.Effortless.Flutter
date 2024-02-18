@@ -15,13 +15,13 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
   }) {
     // Check if there is already a registration
     if (_isInstanceRegistered(T, name: name, key: key, environment: environment)) {
-      //LogHelper.logWarning(registrationAlreadyExistsForType(T));
       return Triplet.second(Conflict('Registration already exists for type $T. Skipping registration.'));
     }
 
     // Create a registration
     var registration = SingletonRegistration<T>(
       instance: instance,
+      interfaces: interfaces,
       name: name,
       key: key,
       environment: environment,
@@ -30,14 +30,6 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     // Register the instance
     _registrations[T] ??= [];
     _registrations[T]!.add(registration);
-
-    // Register the interfaces
-    if (interfaces != null) {
-      for (var interface in interfaces) {
-        _registrations[interface] ??= [];
-        _registrations[interface]!.add(registration);
-      }
-    }
 
     return Triplet.first(Success());
   }
@@ -51,13 +43,13 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required String? environment,
   }) {
     if (_isInstanceRegistered(T, name: name, key: key, environment: environment)) {
-      //LogHelper.logWarning(registrationAlreadyExistsForType(T));
       return Triplet.second(Conflict('Registration already exists for type $T. Skipping registration.'));
     }
 
     // Create a registration
     var registration = FactoryRegistration<T>(
       factory: factory,
+      interfaces: interfaces,
       name: name,
       key: key,
       environment: environment,
@@ -66,14 +58,6 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     // Register the instance
     _registrations[T] ??= [];
     _registrations[T]!.add(registration);
-
-    // Register the interfaces
-    if (interfaces != null) {
-      for (var interface in interfaces) {
-        _registrations[interface] ??= [];
-        _registrations[interface]!.add(registration);
-      }
-    }
 
     return Triplet.first(Success());
   }
@@ -93,7 +77,6 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
 
     // If there are no instances, return a NotFound
     if (allInstancesResponse.isSecond) {
-      //LogHelper.logInfo(noRegistrationFoundForType(T));
       return Triplet.second(allInstancesResponse.second);
     }
 
@@ -107,35 +90,43 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required key,
     required String? environment,
   }) {
-    var allRegistrations = _registrations[T] ?? [];
+    // Filter by the types
+    var matchedRegistrations = _registrations.entries.expand((entry) {
+      // Check if the registration key (the concrete class) is T
+      bool isConcreteMatch = entry.key == T;
 
-    // Check if there are any registrations
-    if (allRegistrations.isEmpty) {
-      //LogHelper.logInfo(noRegistrationFoundForType(T));
-      return Triplet.second(NotFound('No registration found for type $T.'));
-    }
+      // Filter registrations where T is an interface or the concrete class itself
+      return entry.value.where((registration) {
+        return isConcreteMatch || (registration.interfaces?.contains(T) ?? false);
+      });
+    }).toList();
 
     // Filter by the name
     if (name != null) {
-      allRegistrations = allRegistrations.where((registration) {
+      matchedRegistrations = matchedRegistrations.where((registration) {
         return registration.name == name;
       }).toList();
     }
 
     // Filter by the key
-    allRegistrations = allRegistrations.where((registration) {
+    matchedRegistrations = matchedRegistrations.where((registration) {
       return registration.key == key;
     }).toList();
 
     // Filter by the environment
     if (environment != null) {
-      allRegistrations = allRegistrations.where((registration) {
+      matchedRegistrations = matchedRegistrations.where((registration) {
         return registration.environment == environment;
       }).toList();
     }
 
+    // Check if there are any registrations
+    if (matchedRegistrations.isEmpty) {
+      return Triplet.second(NotFound('No registration found for type $T.'));
+    }
+
     // Resolve the instances
-    var resolvedInstances = allRegistrations.map((registration) {
+    var resolvedInstances = matchedRegistrations.map((registration) {
       return registration.resolve(ServiceLocator.I) as T;
     }).toList();
 
@@ -148,7 +139,25 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required String? name,
     required key,
     required String? environment,
-  }) {}
+  }) {
+    var registration = _registrations.entries.where((element) => element.key == T).firstOrNull?.value.firstOrNull;
+
+    // If there is no registration, return an error
+    if (registration == null) {
+      return Doublet.second(InternalError('No registration found for type $T'));
+    }
+
+    // Construct the new registration
+    var newRegistration = Registration<T>.from(registration, Doublet.first(instance));
+
+    // Remove the old registration
+    _registrations[T]?.remove(registration);
+
+    // Add the new registration
+    _registrations[T]?.add(newRegistration);
+
+    return Doublet.first(Success());
+  }
 
   @override
   Doublet<Success, InternalError> overrideFactory<T extends Object>(
@@ -157,8 +166,23 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required key,
     required String? environment,
   }) {
-    // TODO: implement overrideFactory
-    throw UnimplementedError();
+    var registration = _registrations.entries.where((element) => element.key == T).firstOrNull?.value.firstOrNull;
+
+    // If there is no registration, return an error
+    if (registration == null) {
+      return Doublet.second(InternalError('No registration found for type $T'));
+    }
+
+    // Construct the new registration
+    var newRegistration = Registration<T>.from(registration, Doublet.second(factory));
+
+    // Remove the old registration
+    _registrations[T]?.remove(registration);
+
+    // Add the new registration
+    _registrations[T]?.add(newRegistration);
+
+    return Doublet.first(Success());
   }
 
   @override
@@ -167,8 +191,11 @@ class InglueServiceLocatorAdapter implements ServiceLocatorAdapter {
     required key,
     required String? environment,
   }) {
-    // TODO: implement unregister
-    throw UnimplementedError();
+    _registrations[T]?.removeWhere((registration) {
+      return registration.name == name && registration.key == key && registration.environment == environment;
+    });
+
+    return Triplet.first(Success());
   }
 
   @override

@@ -1,39 +1,64 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# zef_di_abstractions
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Your Package Description: A brief description of what your package does and its primary use case.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- **Framework Agnostic**: Designed to be a flexible wrapper, this package can be used with any Dependency Injection (DI) framework, offering a unified interface for service registration and resolution.
+- **Multiple Service Resolution**: Supports resolving multiple services registered under the same interface, enhancing the flexibility of service retrieval in complex applications.
+- **Custom Adapter Integration**: Enables users to integrate any external DI framework by writing custom adapters, ensuring compatibility and extending functionality according to project needs.
 
-## Getting started
+## Getting Started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use this package, you'll first need to choose a DI framework and then implement an adapter to integrate it with the wrapper. There is already a library which provides a wrapper to use with this package: [zef_di_inglue](https://pub.dev/packages/zef_di_inglue).
 
-## Usage
+## Implementing a Custom Adapter
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Since this package does not provide direct implementations for DI frameworks, you'll need to create a custom adapter for your chosen framework. Here's a conceptual example to guide you:
 
 ```dart
-const like = 'sample';
+class MyDIAdapter extends ServiceLocatorAdapter {
+  // Implement the adapter methods using your chosen DI framework
+}
 ```
 
-## Additional information
+## Initialization and Usage
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+With your custom adapter in place, initialize the ServiceLocator like so:
+
+```dart
+void main() {
+  ServiceLocatorBuilder()
+    .withAdapter(MyDIAdapter())
+    .build();
+
+  // Your application logic here
+}
+```
+
+### Registering Services
+
+```dart
+ServiceLocator.I.registerInstance(YourService());
+ServiceLocator.I.registerFactory(() => YourService());
+```
+
+### Resolving Services
+
+Regardless of the underlying DI framework, you can resolve services through our unified interface:
+
+```dart
+// For single service resolution
+final myService = ServiceLocator.I.getFirst<MyServiceInterface>();
+
+// For multiple services under the same interface
+final myServices = ServiceLocator.I.getAll<MyServiceInterface>();
+```
+
+## Customization and Extensibility
+
+Our package's design encourages customization and extensibility. By creating adapters for your chosen DI frameworks, you can leverage our wrapper's features while utilizing the specific functionalities and optimizations of those frameworks.
+
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines and code of conduct before submitting pull requests or issues. Also every annotation or idea to improve is warmly appreciated.

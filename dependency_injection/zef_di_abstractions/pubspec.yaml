@@ -2,6 +2,14 @@ name: zef_di_abstractions
 description: A starting point for Dart libraries or applications.
 version: 0.0.1
 repository: https://github.com/zooper-lib/Zooper.Effortless.Flutter
+topics:
+  - dependency-injection
+  - di
+  - injection
+  - ioc
+  - inversion-of-control
+funding:
+  - https://www.buymeacoffee.com/zooperlib
 
 environment:
   sdk: ^3.2.6

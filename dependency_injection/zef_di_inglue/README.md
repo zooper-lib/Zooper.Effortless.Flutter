@@ -1,39 +1,36 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# zef_di_inglue
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+This package offers an implementation for the `ServiceLocatorAdapter` from package [zef_di_abstractions](https://pub.dev/packages/zef_di_abstractions).
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
+## Getting Started
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+To get started with `zef_di_inglue`, add it to your project's dependency list:
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+```yaml
+dependencies:
+  zef_di_inglue: ^latest_version
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+1. Set up the adapter
+
+Check the readme of [zef_di_abstractions](https://pub.dev/packages/zef_di_abstractions) to get started. In the setup process you will need to add an adapter for the `ServiceLocator`, and thats where this package comes in play:
 
 ```dart
-const like = 'sample';
+void main() {
+  ServiceLocatorBuilder()
+    .withAdapter(InglueServiceLocatorAdapter()) // This is your adapter which handles the service registration
+    .build();
+
+  // Your application logic here
+}
 ```
 
-## Additional information
+2. Register the services
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+Now you can continue to register the services. Again, see the readme of [zef_di_abstractions](https://pub.dev/packages/zef_di_abstractions)
+
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines and code of conduct before submitting pull requests or issues. Also every annotation or idea to improve is warmly appreciated.

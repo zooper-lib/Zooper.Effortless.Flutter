@@ -63,9 +63,10 @@ void main() {
         environment: null,
       );
 
-      expect(ServiceLocator.I.getAll<Eagle>(), isNotNull);
-      expect(ServiceLocator.I.getAll<Eagle>(), isNotNull);
-      expect(ServiceLocator.I.getAll<Eagle>().length, 1);
+      final eagleList = ServiceLocator.I.getAll<Eagle>();
+
+      expect(eagleList, isNotNull);
+      expect(eagleList.length, 1);
     });
 
     test('Register a factory with not injected dependencies - Expect Warning', () {

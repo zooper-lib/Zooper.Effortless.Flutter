@@ -12,20 +12,20 @@ void main() {
   ServiceLocator.I.registerInstance(
     Dolphin(),
     interfaces: [Animal, Fish],
-    name: 'Dolphin',
   );
 
   ServiceLocator.I.registerInstance(
     Dolphin(),
     interfaces: [Animal, Fish],
-    name: 'Dolphin2',
   );
 
   // Retrieve the Singleton
-  final instance = ServiceLocator.I.getFirst<Dolphin>(
-    name: 'Dolphin',
-  );
+  final instance = ServiceLocator.I.getFirst<Dolphin>();
 
-  // Do something with the instance
+  // Retrieve the instance via the interface
+  final interfaceInstance = ServiceLocator.I.getFirst<Animal>();
+
+  // Do something with the instances
   print(instance.runtimeType); // Output: Dolphin
+  print(interfaceInstance.runtimeType); // Output: Dolphin
 }
