@@ -1,12 +1,12 @@
 parameters:
-  - name: projectPath
+  - name: libraryPath
     type: string
     default: ""
 
 steps:
   - script: |
-      cd ${{ parameters.projectPath }}
-    displayName: Change Directory to ${{ parameters.projectPath }}
+      cd ${{ parameters.libraryPath }}
+    displayName: Change Directory to ${{ parameters.libraryPath }}
 
   - script: |
       flutter pub get
