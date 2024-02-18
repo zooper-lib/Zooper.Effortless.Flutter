@@ -9,8 +9,8 @@ pool:
 
 steps:
   - script: |
-      wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.2.6-stable.tar.xz
-      tar xf flutter_linux_3.2.6-stable.tar.xz
+      wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.3.0-stable.tar.xz
+      tar xf flutter_linux_3.3.0-stable.tar.xz
       echo "##vso[task.prependpath]$(pwd)/flutter/bin"
     displayName: "Install Flutter"
 
