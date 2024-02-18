@@ -17,9 +17,7 @@ steps:
   - template: build_and_test_template.yaml
     parameters:
       libraryPath: "dependency_injection/zef_di_abstractions"
-    displayName: "zef_di_abstractions"
 
   - template: build_and_test_template.yaml
     parameters:
       libraryPath: "dependency_injection/zef_di_inglue"
-    displayName: "zef_di_inglue"
