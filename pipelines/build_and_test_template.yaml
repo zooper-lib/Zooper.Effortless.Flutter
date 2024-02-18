@@ -6,16 +6,7 @@ parameters:
 steps:
   - script: |
       cd ${{ parameters.libraryPath }}
-    displayName: Change Directory to ${{ parameters.libraryPath }}
-
-  - script: |
       flutter pub get
-    displayName: Get Flutter Dependencies
-
-  - script: |
       flutter test
-    displayName: Run Flutter Tests
-
-  - script: |
       flutter analyze
-    displayName: Analyze Flutter Code
+    displayName: "Get Dependencies, run tests and analyze for ${{ parameters.libraryPath }}"
