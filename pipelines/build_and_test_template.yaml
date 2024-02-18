@@ -1,0 +1,21 @@
+parameters:
+  - name: projectPath
+    type: string
+    default: ""
+
+steps:
+  - script: |
+      cd ${{ parameters.projectPath }}
+    displayName: Change Directory to ${{ parameters.projectPath }}
+
+  - script: |
+      flutter pub get
+    displayName: Get Flutter Dependencies
+
+  - script: |
+      flutter test
+    displayName: Run Flutter Tests
+
+  - script: |
+      flutter analyze
+    displayName: Analyze Flutter Code

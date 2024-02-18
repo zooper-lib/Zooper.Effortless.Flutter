@@ -1,0 +1,25 @@
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - script: |
+      wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_2.2.3-stable.tar.xz
+      tar xf flutter_linux_2.2.3-stable.tar.xz
+      echo "##vso[task.prependpath]$(pwd)/flutter/bin"
+    displayName: "Install Flutter"
+
+  - template: build_and_test_template.yaml
+    parameters:
+      libraryPath: "dependency_injection/zef_di_abstractions"
+    displayName: "zef_di_abstractions"
+
+  - template: build_and_test_template.yaml
+    parameters:
+      libraryPath: "dependency_injection/zef_di_inglue"
+    displayName: "zef_di_inglue"
