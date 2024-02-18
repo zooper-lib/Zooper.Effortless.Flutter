@@ -6,7 +6,7 @@ parameters:
 steps:
   - script: |
       cd ${{ parameters.libraryPath }}
-      flutter pub get
-      flutter test
-      flutter analyze
+      dart pub get
+      dart test
+      dart analyze
     displayName: "Get Dependencies, run tests and analyze for ${{ parameters.libraryPath }}"
