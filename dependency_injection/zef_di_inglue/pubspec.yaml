@@ -4,7 +4,7 @@ version: 0.0.1
 repository: https://github.com/zooper-lib/Zooper.Effortless.Flutter
 
 environment:
-  sdk: ^3.2.6
+  sdk: ">=2.18.0 <4.0.0"
 
 # Add regular dependencies here.
 dependencies:
