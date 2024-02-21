@@ -1,0 +1,3 @@
+class GenerateHandlerRegistration {
+  const GenerateHandlerRegistration();
+}

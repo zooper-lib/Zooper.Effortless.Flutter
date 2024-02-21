@@ -1,0 +1,12 @@
+parameters:
+  - name: libraryPath
+    type: string
+    default: ""
+
+steps:
+  - script: |
+      cd ${{ parameters.libraryPath }}
+      dart pub get
+      dart test
+      dart analyze
+    displayName: "Get Dependencies, run tests and analyze for ${{ parameters.libraryPath }}"
