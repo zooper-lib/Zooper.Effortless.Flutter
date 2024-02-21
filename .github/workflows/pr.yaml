@@ -24,10 +24,10 @@ jobs:
           sdk: stable
 
       - name: Install dependencies
-        run: dart pub get
+        run: cd ${{ env.PROJECT_DIR }} && dart pub get
 
       - name: Run dart analyze
-        run: dart analyze
+        run: cd ${{ env.PROJECT_DIR }} && dart analyze
 
       - name: Run tests
-        run: dart test
+        run: cd ${{ env.PROJECT_DIR }} && dart test
