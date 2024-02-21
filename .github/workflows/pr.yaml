@@ -10,9 +10,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - PROJECT_NAME: zef_di_abstractions
-            PROJECT_DIR2: dependency_injection
-            PROJECT_PATH: dependency_injection/zef_di_abstractions
+          - PROJECT_PATH: dependency_injection/zef_di_abstractions
+          - PROJECT_PATH: dependency_injection/zef_di_inglue
 
     env:
       PROJECT_DIR: ${{ matrix.PROJECT_PATH }}
