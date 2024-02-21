@@ -26,7 +26,7 @@ jobs:
         run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart pub get
 
       - name: Run dart analyze
-        run: cd ${{ env.PROJECT_DIR }} && dart analyze
+        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart analyze
 
       - name: Run tests
-        run: cd ${{ env.PROJECT_DIR }} && dart test
+        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart test
