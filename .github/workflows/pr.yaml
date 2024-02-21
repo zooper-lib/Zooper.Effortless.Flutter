@@ -23,7 +23,7 @@ jobs:
           sdk: stable
 
       - name: Install dependencies
-        run: cd ${{ env.PROJECT_DIR }} && dart pub get
+        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart pub get
 
       - name: Run dart analyze
         run: cd ${{ env.PROJECT_DIR }} && dart analyze
