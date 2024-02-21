@@ -11,10 +11,11 @@ jobs:
       matrix:
         include:
           - PROJECT_NAME: zef_di_abstractions
-            PROJECT_DIR: dependency_injection/
+            PROJECT_DIR2: dependency_injection
+            PROJECT_PATH: dependency_injection/zef_di_abstractions
 
     env:
-      PROJECT_DIR: ${{ matrix.PROJECT_DIR }}
+      PROJECT_DIR: ${{ matrix.PROJECT_PATH }}
 
     steps:
       - uses: actions/checkout@v2
@@ -23,10 +24,10 @@ jobs:
           sdk: stable
 
       - name: Install dependencies
-        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart pub get
+        run: dart pub get
 
       - name: Run dart analyze
-        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart analyze
+        run: dart analyze
 
       - name: Run tests
-        run: cd ${{ env.PROJECT_DIR }} / ${{ env.PROJECT_NAME }} && dart test
+        run: dart test
