@@ -1,0 +1,32 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  dart_workflow:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - PROJECT_NAME: zef_di_abstractions
+            PROJECT_DIR: dependency_injection/
+
+    env:
+      PROJECT_DIR: ${{ matrix.PROJECT_DIR }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: cd ${{ env.PROJECT_DIR }} && dart pub get
+
+      - name: Run dart analyze
+        run: cd ${{ env.PROJECT_DIR }} && dart analyze
+
+      - name: Run tests
+        run: cd ${{ env.PROJECT_DIR }} && dart test
